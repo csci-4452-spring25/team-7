@@ -4,8 +4,15 @@ terraform {
       source  = "hashicorp/aws"
       version = "5.94.1"
     }
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "2.12.2"
+
+    }
   }
 }
+
+# basic example using ami lookup https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
 
 #configuration for AWS provider
 provider "aws" {
@@ -28,7 +35,7 @@ data "aws_ami" "ubuntu" {
 }
 # Create an EC2 instance
 resource "aws_instance" "solitaire" {
-  ami           = data.aws_ami.ubuntu
+  ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.micro"
 
   tags = {
@@ -36,4 +43,23 @@ resource "aws_instance" "solitaire" {
   }
 }
 
+
+
 # need security group and subnets? maybe?
+
+
+# this has been pulled off of : https://registry.terraform.io/providers/cybershard/docker/latest/docs
+provider "docker" {
+  host = "unix:///var/run/docker.sock"
+}
+
+# Pulls the image
+resource "docker_image" "ubuntu" {
+  name = "ubuntu:latest"
+}
+
+# Create a container
+resource "docker_container" "solitaire-gg" {
+  image = docker_image.ubuntu.latest
+  name  = "solitaire-gg"
+}
