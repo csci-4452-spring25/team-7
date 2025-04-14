@@ -1,0 +1,14 @@
+# official Scala image base
+FROM hseeberger/scala-sbt:11.0.16_1.8.0_1.7.2_2.13.8
+
+WORKDIR /app
+
+COPY . .
+
+RUN sbt compile
+
+# may change
+EXPOSE 9000
+
+# sbt command to run 
+CMD ["sbt", "run"]
