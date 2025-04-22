@@ -24,7 +24,7 @@ resource "aws_instance" "app_server" {
   key_name      = "my_ec2_key"      
   vpc_security_group_ids = [aws_security_group.app_sg.id]
 
-  # User data: Install Docker and run your container
+  # User data: Install Docker and run container
   user_data = <<-EOF
               #!/bin/bash
               sudo yum update -y
@@ -38,3 +38,4 @@ resource "aws_instance" "app_server" {
 
 
 # need security group and subnets? maybe?
+ 
