@@ -50,7 +50,7 @@ resource "aws_instance" "app_server" {
               sudo systemctl start docker
               sudo usermod -a -G docker ec2-user
               # Pull and run container
-              docker run -d --restart unless-stopped -it -p 3000:8989 sawayama-solitaire
+              docker run -d --restart unless-stopped -p 3000:3000 sawayama-solitaire
               EOF
 }
 
