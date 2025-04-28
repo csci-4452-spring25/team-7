@@ -61,6 +61,9 @@ resource "aws_instance" "app_server" {
               docker run -d --restart unless-stopped -it -p 3000:3000 sawayama-solitaire
               logout
               EOF
+  tags = {
+    Name = "app-server"
+  }
 }
 
 # need security group and subnets? maybe?
