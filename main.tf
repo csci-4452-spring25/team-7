@@ -20,6 +20,8 @@ provider "aws" {
   region = "us-east-1"
 }
 
+#changed token to write,read,and delete
+
 # setting up a security group to allow http traffic and allow all outgoing
 resource "aws_security_group" "app_sg" {
   name        = "app-security-group"
