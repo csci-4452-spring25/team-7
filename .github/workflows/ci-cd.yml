@@ -1,31 +1,31 @@
 name: Solitaire CI/CD Pipeline
 
 on:
-    push:
-        branches: 
-            - main
+  push:
+    branches:
+      - main
 
 jobs:
-    build-test-deploy:
+  build-test-deploy:
     runs-on: ubuntu-latest
     steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Login to dockerhub
-         uses: docker/login-action@v1
-         with:
-            username: ${{Secrets.DOCKER_USERNAME}}
-            password: ${{Secrets.DOCKER_TOKEN}}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
-        - name: Build and push docker image
-         uses: docker/build-push-action@v2
-         with:
-            context: ./sawayama-solitaire
-            push: true
-            tags: ${{secrets.DOCKER_USERNAME}}/sawayama-solitaire:latest
- 
-        - name: Deploy on EC2 via SSH
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./sawayama-solitaire
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
+
+      - name: Deploy on EC2 via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -36,9 +36,3 @@ jobs:
             docker stop sawayama-solitaire || true
             docker rm sawayama-solitaire || true
             docker run -d --restart unless-stopped --name sawayama-solitaire -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
-     
-
-    
-      
-
-
