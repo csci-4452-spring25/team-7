@@ -21,20 +21,24 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v6
         with:
           context: ./sawayama-solitaire
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
 
-      - name: Deploy on EC2 via SSH
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
+      - name: Install SSH key
+        run: |
+          mkdir ~/.ssh
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{secrets.EC2_KEY}}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{secrets.EC2_HOST}} > ~/.ssh/known_hosts
+
+      - name: Deploy to EC2
+        run: |
+          ssh ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
             docker pull ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
             docker stop sawayama-solitaire || true
             docker rm sawayama-solitaire || true
             docker run -d --restart unless-stopped --name sawayama-solitaire -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
+          EOF
