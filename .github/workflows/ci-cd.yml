@@ -1,3 +1,4 @@
+#pipeline to build & push docker image and then pull docker image and install on ec2 via ssh
 name: Solitaire CI/CD Pipeline
 
 on:
