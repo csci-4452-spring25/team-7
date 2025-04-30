@@ -1,4 +1,10 @@
 terraform {
+
+  backend "s3" {
+    bucket = "game-bucket"
+    key    = "state/main.tf.tfstate"
+    region = "us-east-1"
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -52,15 +58,13 @@ resource "aws_instance" "app_server" {
 
   # User data: Install Docker and run container
   user_data = <<-EOF
-              #!/bin/bash
-              sudo yum update -y
-              sudo amazon-linux-extras install docker -y
-              sudo systemctl start docker
-              sudo systemctl enable docker
-              sudo usermod -a -G docker ec2-user
-              docker run -d --restart unless-stopped -it -p 3000:3000 sawayama-solitaire
-              logout
-              EOF
+    #!/bin/bash
+    sudo yum update -y
+    sudo amazon-linux-extras install docker -y
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    logout
+  EOF 
   tags = {
     Name = "app-server"
   }
