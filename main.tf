@@ -2,6 +2,7 @@ resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 }
 
+#i am so much sad
 resource "aws_security_group" "app_sg" {
   vpc_id      = aws_vpc.main.id  # Make sure the security group is in the same VPC
   name        = "app-security-group"
