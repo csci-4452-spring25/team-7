@@ -1,23 +1,9 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
 }
 
-# basic example using ami lookup https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
-
-#configuration for AWS provider
-provider "aws" {
-  region = "us-east-1"
-}
-
-#changed token to write,read,and delete
-
-# setting up a security group to allow http traffic and allow all outgoing
 resource "aws_security_group" "app_sg" {
+  vpc_id      = aws_vpc.main.id  # Make sure the security group is in the same VPC
   name        = "app-security-group"
   description = "Allow HTTP inbound traffic and all outbound traffic"
 
@@ -46,13 +32,25 @@ resource "aws_security_group" "app_sg" {
   }
 }
 
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.main.id  # Ensure the subnet is in the same VPC
+  cidr_block              = "10.0.0.0/24"
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "Public Subnet"
+  }
+}
+
 resource "aws_instance" "app_server" {
-  ami                    = "ami-0e449927258d45bc4" #published 04/11/2025
-  instance_type          = "t2.micro"              # Free tier eligible // for now 
+  ami                    = "ami-0e449927258d45bc4"
+  instance_type           = "t2.micro"
   key_name               = "my_ec2_key"
   vpc_security_group_ids = [aws_security_group.app_sg.id]
+  subnet_id              = aws_subnet.public_subnet.id  # Reference the same subnet
 
-  # User data: Install Docker and run container
+  associate_public_ip_address = true
+
   user_data = <<-EOF
               #!/bin/bash
               sudo yum update -y
