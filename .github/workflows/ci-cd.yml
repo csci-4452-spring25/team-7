@@ -52,9 +52,16 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
 
-      - name: Add EC2 host to known_hosts
+      - name: Wait & add EC2 to known_hosts
         run: |
-          ssh-keyscan -H "$EC2_PUBLIC_IP" >> ~/.ssh/known_hosts
+          echo "Waiting 15 seconds for EC2 to be reachable..."
+          sleep 15
+
+          echo "Pinging EC2 at $EC2_PUBLIC_IP"
+          ping -c 4 "$EC2_PUBLIC_IP"
+
+          echo "Running ssh-keyscan..."
+          ssh-keyscan -T 10 -v "$EC2_PUBLIC_IP" >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
         run: |
