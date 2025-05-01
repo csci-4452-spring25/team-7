@@ -32,7 +32,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
-          chmod 700 ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: Connect to EC2 and pull/run Docker image
@@ -42,5 +42,5 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
             docker stop solitaire || true
             docker rm solitaire || true
-            docker run -d --name solitaire -p 80:80 ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
+            docker run -d --name solitaire -p 80:3000 ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
           EOF
