@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - sabdalah-branch
+      - sgusain-branch
 
 jobs:
   build-test-deploy:
@@ -42,5 +43,5 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
             docker stop solitaire || true
             docker rm solitaire || true
-            docker run -d --name solitaire -p 80:3000 ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
+            docker run -d --name solitaire -p 80:80 ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
           EOF
