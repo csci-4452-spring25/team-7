@@ -49,6 +49,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
 
+          #YOUR MOM
       - name: Add EC2 host to known_hosts
         run: |
           ssh-keyscan $EC2_PUBLIC_IP >> ~/.ssh/known_hosts
