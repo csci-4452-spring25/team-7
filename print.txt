@@ -1,0 +1,16 @@
+ 1016  open main.tf
+ 1017  pwd
+ 1018  cd ..
+ 1019  cd ..
+ 1020  cd team-7
+ 1021  open my_ec2_key.pem
+ 1022  code my_ec2_key.pem
+ 1023  vim my_ec2_key.pem
+ 1024  mk dir p
+ 1025  mkdir p
+ 1026  mkdir p
+ 1027  cd ..
+ 1028  cat ~/.bash_history
+ 1029  cd team-7
+ 1030  cat ~/.bash_history
+ 1031  history

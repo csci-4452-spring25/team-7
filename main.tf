@@ -1,12 +1,30 @@
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
+provider "aws" {
+  region = "us-east-1" # Change if needed
 }
 
-#i am so much sad
+# Use default VPC
+data "aws_vpc" "default" {
+  default = true
+}
+
+# Get all subnets in default VPC
+data "aws_subnets" "default_subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+# Select the first subnet (assumed to be public)
+data "aws_subnet" "default" {
+  id = tolist(data.aws_subnets.default_subnets.ids)[0]
+}
+
+# Security group for SSH and app port
 resource "aws_security_group" "app_sg" {
-  vpc_id      = aws_vpc.main.id  # Make sure the security group is in the same VPC
   name        = "app-security-group"
-  description = "Allow HTTP inbound traffic and all outbound traffic"
+  description = "Allow SSH and app traffic"
+  vpc_id      = data.aws_vpc.default.id
 
   ingress {
     description = "Allow HTTP from anywhere"
@@ -25,7 +43,7 @@ resource "aws_security_group" "app_sg" {
   }
 
   egress {
-    description = "Allow all outbound traffic"
+    description = "Allow all outbound"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -33,36 +51,32 @@ resource "aws_security_group" "app_sg" {
   }
 }
 
-resource "aws_subnet" "public_subnet" {
-  vpc_id                  = aws_vpc.main.id  # Ensure the subnet is in the same VPC
-  cidr_block              = "10.0.0.0/24"
-  availability_zone       = "us-east-1a"
-  map_public_ip_on_launch = true
-  tags = {
-    Name = "Public Subnet"
-  }
-}
-
+# EC2 Instance
 resource "aws_instance" "app_server" {
-  ami                    = "ami-0e449927258d45bc4"
-  instance_type           = "t2.micro"
-  key_name               = "my_ec2_key"
-  vpc_security_group_ids = [aws_security_group.app_sg.id]
-  subnet_id              = aws_subnet.public_subnet.id  # Reference the same subnet
-
+  ami                         = "ami-0e449927258d45bc4" # Amazon Linux 2 (us-east-1)
+  instance_type               = "t2.micro"
+  key_name                    = "my_ec2_key" # Must exist in AWS
+  subnet_id                   = data.aws_subnet.default.id
+  vpc_security_group_ids      = [aws_security_group.app_sg.id]
   associate_public_ip_address = true
 
   user_data = <<-EOF
-              #!/bin/bash
+             #!/bin/bash
               sudo yum update -y
               sudo yum install docker -y
               sudo systemctl start docker
               sudo systemctl enable docker
               sudo usermod -aG docker ec2-user
               docker run -d --restart unless-stopped -p 3000:3000 sawayama-solitaire
-              EOF
+              logout
+              EOF 
 
   tags = {
     Name = "app-server"
   }
+}
+
+# Output public IP
+output "public_ip" {
+  value = aws_instance.app_server.public_ip
 }
