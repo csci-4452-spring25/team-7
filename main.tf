@@ -1,28 +1,12 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
-# basic example using ami lookup https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
-
-#configuration for AWS provider
 provider "aws" {
   region = "us-east-1"
 }
 
-#changed token to write,read,and delete
-
-# setting up a security group to allow http traffic and allow all outgoing
 resource "aws_security_group" "app_sg" {
   name        = "app-security-group"
-  description = "Allow HTTP inbound traffic and all outbound traffic"
-
+  description = "Allow HTTP and SSH"
+  
   ingress {
-    description = "Allow HTTP from anywhere"
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
@@ -30,7 +14,6 @@ resource "aws_security_group" "app_sg" {
   }
 
   ingress {
-    description = "Allow SSH from anywhere"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -38,7 +21,6 @@ resource "aws_security_group" "app_sg" {
   }
 
   egress {
-    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -47,21 +29,20 @@ resource "aws_security_group" "app_sg" {
 }
 
 resource "aws_instance" "app_server" {
-  ami                    = "ami-0e449927258d45bc4" #published 04/11/2025
-  instance_type          = "t2.micro"              # Free tier eligible // for now 
+  ami                    = "ami-0e449927258d45bc4"
+  instance_type          = "t2.micro"
   key_name               = "my_ec2_key"
   vpc_security_group_ids = [aws_security_group.app_sg.id]
-
-  # User data: Install Docker and run container
+  
   user_data = <<-EOF
-              #!/bin/bash
-              sudo yum update -y
-              sudo yum install docker -y
-              sudo systemctl start docker
-              sudo systemctl enable docker
-              sudo usermod -aG docker ec2-user
-              docker run -d --restart unless-stopped -p 3000:3000 sawayama-solitaire
-              EOF
+    #!/bin/bash
+    sudo yum update -y
+    sudo yum install docker -y
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    sudo usermod -aG docker ec2-user
+    docker run -d --restart unless-stopped -p 3000:3000 sawayama-solitaire
+  EOF
 
   tags = {
     Name = "app-server"
