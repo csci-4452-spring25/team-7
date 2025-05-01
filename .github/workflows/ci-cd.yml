@@ -35,6 +35,7 @@ jobs:
       - name: Fetch EC2 Public IP
         id: fetch-ip
         run: |
+          sleep 5
           INSTANCE_ID=$(aws ec2 describe-instances \
             --filters "Name=tag:Name,Values=app-server" \
             --query "Reservations[*].Instances[*].InstanceId" \
@@ -50,12 +51,10 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
 
           #YOUR MOM
-      - name: Add EC2 host to known_hosts
-        run: |
-          ssh-keyscan $EC2_PUBLIC_IP >> ~/.ssh/known_hosts
+
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$EC2_PUBLIC_IP << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@${{secrets.EC2_HOST}} << 'EOF'
             sleep 5
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
