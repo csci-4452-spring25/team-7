@@ -1,7 +1,10 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 # pipeline to build & push docker image and then pull docker image and install on ec2 via ssh
 >>>>>>> origin/main
+=======
+>>>>>>> origin/sabdalah-branch
 name: Solitaire CI/CD Pipeline
 
 on:
@@ -32,10 +35,12 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
 
+          #it is here every single F time
       - name: Install SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
+<<<<<<< HEAD
           chmod 600 ~/.ssh/id_rsa
 <<<<<<< HEAD
 
@@ -69,14 +74,26 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$EC2_PUBLIC_IP << EOF
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
 =======
+=======
+          chmod 700 ~/.ssh/id_rsa
+>>>>>>> origin/sabdalah-branch
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to EC2
+      - name: Connect to EC2 and pull/run Docker image
         run: |
+<<<<<<< HEAD
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << EOF
 >>>>>>> origin/main
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
             sudo docker stop sawayama-solitaire || true
             sudo docker rm sawayama-solitaire || true
             sudo docker run -d --restart unless-stopped --name sawayama-solitaire -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
+=======
+          ssh -i ~/.ssh/id_rsa ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
+            docker pull ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
+            docker stop solitaire || true
+            docker rm solitaire || true
+            docker run -d --name solitaire -p 80:80 ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
+>>>>>>> origin/sabdalah-branch
           EOF

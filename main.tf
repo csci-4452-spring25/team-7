@@ -1,5 +1,6 @@
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
+<<<<<<< HEAD
 }
 
 resource "aws_internet_gateway" "igw" {
@@ -39,6 +40,14 @@ resource "aws_security_group" "app_sg" {
   vpc_id = aws_vpc.main.id
   name   = "app-sg"
   description = "Allow HTTP and SSH"
+=======
+}
+
+resource "aws_security_group" "app_sg" {
+  vpc_id      = aws_vpc.main.id  # Make sure the security group is in the same VPC
+  name        = "app-security-group"
+  description = "Allow HTTP inbound traffic and all outbound traffic"
+>>>>>>> origin/sabdalah-branch
 
   ingress {
     description = "HTTP"
@@ -64,12 +73,30 @@ resource "aws_security_group" "app_sg" {
   }
 }
 
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.main.id  # Ensure the subnet is in the same VPC
+  cidr_block              = "10.0.0.0/24"
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "Public Subnet"
+  }
+}
+
 resource "aws_instance" "app_server" {
   ami                    = "ami-0e449927258d45bc4"
+<<<<<<< HEAD
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_subnet.id
   key_name               = "my_ec2_key"
   vpc_security_group_ids = [aws_security_group.app_sg.id]
+=======
+  instance_type           = "t2.micro"
+  key_name               = "my_ec2_key"
+  vpc_security_group_ids = [aws_security_group.app_sg.id]
+  subnet_id              = aws_subnet.public_subnet.id  # Reference the same subnet
+
+>>>>>>> origin/sabdalah-branch
   associate_public_ip_address = true
 
   user_data = <<-EOF
