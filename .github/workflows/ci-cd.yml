@@ -44,3 +44,5 @@ jobs:
             sudo docker rm sawayama-solitaire || true
             sudo docker run -d --restart unless-stopped --name sawayama-solitaire -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
           EOF
+
+#added useless comment for valid push
