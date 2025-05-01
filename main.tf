@@ -8,7 +8,6 @@ resource "aws_internet_gateway" "igw" {
 
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.main.id
-
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
@@ -18,9 +17,8 @@ resource "aws_route_table" "public_rt" {
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.0.0/24"
-  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
-
+  availability_zone       = "us-east-1a"
   tags = {
     Name = "Public Subnet"
   }
@@ -32,41 +30,40 @@ resource "aws_route_table_association" "public_rt_assoc" {
 }
 
 resource "aws_security_group" "app_sg" {
-  vpc_id      = aws_vpc.main.id
-  name        = "app-security-group"
-  description = "Allow HTTP and SSH access"
+  vpc_id = aws_vpc.main.id
+  name   = "app-sg"
+  description = "Allow HTTP and SSH"
 
   ingress {
-    description = "Allow HTTP from anywhere"
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
+    description = "HTTP"
+    from_port = 3000
+    to_port = 3000
+    protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description = "Allow SSH from anywhere"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
+    description = "SSH"
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    description = "Allow all outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
 resource "aws_instance" "app_server" {
-  ami                         = "ami-0e449927258d45bc4"
-  instance_type               = "t2.micro"
-  key_name                    = "my_ec2_key"
-  vpc_security_group_ids      = [aws_security_group.app_sg.id]
-  subnet_id                   = aws_subnet.public_subnet.id
+  ami                    = "ami-0e449927258d45bc4"
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.public_subnet.id
+  key_name               = "my_ec2_key"
+  vpc_security_group_ids = [aws_security_group.app_sg.id]
   associate_public_ip_address = true
 
   user_data = <<-EOF
