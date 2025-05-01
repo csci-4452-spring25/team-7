@@ -1,4 +1,10 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
 # pipeline to build & push docker image and then pull docker image and install on ec2 via ssh
+>>>>>>> origin/main
+=======
+>>>>>>> origin/sabdalah-branch
 name: Solitaire CI/CD Pipeline
 
 on:
@@ -11,6 +17,7 @@ on:
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,18 +35,65 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
 
+          #it is here every single F time
       - name: Install SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
+<<<<<<< HEAD
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+<<<<<<< HEAD
+
+      - name: Fetch EC2 Public IP
+        id: fetch-ip
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=app-server" \
+            --query "Reservations[*].Instances[*].InstanceId" --output text)
+          PUBLIC_IP=$(aws ec2 describe-instances \
+            --instance-ids $INSTANCE_ID \
+            --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
+          echo "EC2_PUBLIC_IP=$PUBLIC_IP" >> $GITHUB_ENV
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: Wait & add EC2 to known_hosts
+        run: |
+          echo "Waiting up to 60s for EC2 to be reachable..."
+          for i in {1..6}; do
+            ping -c 1 $EC2_PUBLIC_IP && break
+            echo "Waiting 10s more..."
+            sleep 10
+          done
+          ssh-keyscan -H $EC2_PUBLIC_IP >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
         run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$EC2_PUBLIC_IP << EOF
+            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
+=======
+=======
+          chmod 700 ~/.ssh/id_rsa
+>>>>>>> origin/sabdalah-branch
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Connect to EC2 and pull/run Docker image
+        run: |
+<<<<<<< HEAD
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << EOF
+>>>>>>> origin/main
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
             sudo docker stop sawayama-solitaire || true
             sudo docker rm sawayama-solitaire || true
             sudo docker run -d --restart unless-stopped --name sawayama-solitaire -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
+=======
+          ssh -i ~/.ssh/id_rsa ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
+            docker pull ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
+            docker stop solitaire || true
+            docker rm solitaire || true
+            docker run -d --name solitaire -p 80:80 ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
+>>>>>>> origin/sabdalah-branch
           EOF
