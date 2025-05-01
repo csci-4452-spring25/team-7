@@ -15,7 +15,6 @@ data "aws_subnets" "default_subnets" {
   }
 }
 
-# Select the first subnet (assumed to be public)
 data "aws_subnet" "default" {
   id = tolist(data.aws_subnets.default_subnets.ids)[0]
 }
@@ -51,6 +50,7 @@ resource "aws_security_group" "app_sg" {
   }
 }
 
+
 # EC2 Instance
 resource "aws_instance" "app_server" {
   ami                         = "ami-0e449927258d45bc4" # Amazon Linux 2 (us-east-1)
@@ -80,3 +80,5 @@ resource "aws_instance" "app_server" {
 output "public_ip" {
   value = aws_instance.app_server.public_ip
 }
+
+#update on secrets push
