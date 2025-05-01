@@ -36,7 +36,7 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} 
+          ssh -o StrictHostKeyChecking=no -i ec2-user@${{ secrets.EC2_HOST }} 
           sleep 5
           << EOF
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
