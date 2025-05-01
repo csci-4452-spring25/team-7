@@ -1,4 +1,4 @@
-#pipeline to build & push docker image and then pull docker image and install on ec2 via ssh
+# pipeline to build & push docker image and then pull docker image and install on ec2 via ssh
 name: Solitaire CI/CD Pipeline
 
 on:
@@ -36,7 +36,7 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << EOF
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << EOF
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
             sudo docker stop sawayama-solitaire || true
             sudo docker rm sawayama-solitaire || true
