@@ -29,6 +29,12 @@ resource "aws_route_table_association" "public_rt_assoc" {
   route_table_id = aws_route_table.public_rt.id
 }
 
+<<<<<<< HEAD
+=======
+#changed token to write,read,and delete
+
+# setting up a security group to allow http traffic and allow all outgoing
+>>>>>>> origin/main
 resource "aws_security_group" "app_sg" {
   vpc_id = aws_vpc.main.id
   name   = "app-sg"
