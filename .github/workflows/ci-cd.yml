@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - sabdalah-branch
+      - sgusain-branch
 
 jobs:
   build-test-deploy:
