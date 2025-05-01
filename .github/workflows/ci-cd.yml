@@ -35,7 +35,6 @@ jobs:
       - name: Fetch EC2 Public IP
         id: fetch-ip
         run: |
-          sleep 5
           INSTANCE_ID=$(aws ec2 describe-instances \
             --filters "Name=tag:Name,Values=app-server" \
             --query "Reservations[*].Instances[*].InstanceId" \
