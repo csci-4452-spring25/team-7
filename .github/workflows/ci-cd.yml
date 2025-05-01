@@ -36,7 +36,9 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << EOF
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} 
+          sleep 5
+          << EOF
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
             sudo docker stop sawayama-solitaire || true
             sudo docker rm sawayama-solitaire || true
