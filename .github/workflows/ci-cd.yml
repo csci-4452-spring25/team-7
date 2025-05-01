@@ -27,6 +27,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/sawayama-solitaire:latest
 
+          #it is here every single F time
       - name: Install SSH key
         run: |
           mkdir -p ~/.ssh
