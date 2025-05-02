@@ -1,3 +1,4 @@
+#adding note for video example
 provider "aws" {
   region = "us-east-1" # Change if needed
 }
@@ -82,6 +83,7 @@ resource "aws_instance" "app_server" {
   tags = {
     Name = "app-server"
   }
+
 }
 
 # Output public IP
